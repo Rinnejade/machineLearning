@@ -1,83 +1,65 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+'''  
+facechop.py
+
+-Takes an image and detects a face in it.  
+-For each face, an image file is generated
+    -the images are strictly of the faces
+'''
+
 import cv2
-from PIL import Image
 import glob
 import os
+import constants 
+
+def facechop(image, code, outFolder):
+    imageName = image.split("/")[1]
+    facedata = "haarcascade_frontalface_default.xml"
+    cascade = cv2.CascadeClassifier(facedata)
+
+    img = cv2.imread(image)
+
+    minisize = (img.shape[1], img.shape[0])
+    miniframe = cv2.resize(img, minisize)
+
+    faces = cascade.detectMultiScale(miniframe)
+
+    for f in faces:
+        x, y, w, h = [v for v in f]
+        cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 255))
+        sub_face = colorResize(img[y:y + h, x:x + w])
+        if(h > ymin and w > xmin):
+            face_file_name = outFolder + code + "_" + str(y) + "_" + imageName
+            cv2.imwrite(face_file_name, sub_face)
 
 
-def detectFace(image, faceCascade, returnImage=False):
-    min_size = (20, 20)
-    image_scale = 1
-    haar_scale = 1.1
-    min_neighbors = 3
-    haar_flags = 0
-
-    cv2.equalizeHist(image, image)
-
-    faces = cv2.HaarDetectObjects(image, faceCascade, cv.CreateMemStorage(
-        0), haar_scale, min_neighbors, haar_flags, min_size)
-
-    if(faces and returnImage):
-        for((x, y, w, h), n) in faces:
-            pt1 = (int(x), int(y))
-            pt2 = (int(x + w), int(y + h))
-            cv2.Rectangle(image, pt1, pt2, cv.RGB(255, 0, 0), 5, 8, 0)
-
-    if returnImage:
-        return image
-    else:
-        return faces
-
-
-def pil2cvgray(pil_im):
-    pil_im = pil_im.convcv_im = cv.CreateImageHeader(
-        pil_im.size, cv.IPL_DEPTH_8U, 1)
-    cv_im = cv2.CreateImageHeader(pil_im.size, cv.IPL_DEPTH_8U, 1)
-    cv2.SetData(cv_im, pil_im.tostring(), pil_im.size[0])
-    return cv_im
-
-
-def cv2pil(cv_im):
-    return Image.fromstring("L", cv2.GetSize(cv_im), cv_im.tostring())
-
-
-def imgCrop(image, cropBox, boxScale=1):
-    xDelta = max(cropBox[2] * (boxScale - 1), 0)
-    yDelta = max(cropBox[3] * (boxScale - 1), 0)
-    PIL_box = [cropBox[0] - xDelta, cropBox[1] - yDelta, cropBox[0] +
-               cropBox[2] + xDelta, cropBox[1] + cropBox[3] + yDelta]
-    return image.crop(PIL_box)
-
-
-def faceCrop(imagePattern, boxScale=1):
-    faceCascade = cv2.Load('haarcascade_frontalface_alt.xml')
+def facecrop(imagePattern, code, outFolder):
     imgList = glob.glob(imagePattern)
     if len(imgList) <= 0:
         print('No Images Found')
         return
 
     for img in imgList:
-        pil_im = Image.open(img)
-        cv_im = pil2cvGrey(pil_im)
-        faces = DetectFace(cv_im, faceCascade)
-        if faces:
-            n = 1
-            for face in faces:
-                croppedImage = imgCrop(pil_im, face[0], boxScale=boxScale)
-                fname, ext = os.path.splitext(img)
-                croppedImage.save(fname + '_crop' + str(n) + ext)
-                n += 1
-        else:
-            print('No faces found:', img)
+        facechop(img, code, outFolder)
 
 
-def test(imageFilePath):
-    pil_im = Image.open(imageFilePath)
-    cv_im = pil2cvGrey(pil_im)
-    faceCascade = cv2.Load('haarcascade_frontalface_alt.xml')
-    face_im = DetectFace(cv_im, faceCascade, returnImage=True)
-    img = cv2pil(face_im)
-    img.show()
-    img.save('test.png')
+def init():
+    if not os.path.exists("face"):
+        os.mkdir("face")
+    if not os.path.exists("test"):
+        os.mkdir("test")
 
-faceCrop('images/*.jpg', boxScale=1)
+
+def colorResize(image):
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    image = cv2.resize(image, outputSize)
+    return image
+
+def test():
+    facecrop("test/*.jpg","1","test/")
+
+if __name__ == '__main__':
+    init()
+    # facecrop("positiveExamples/*.jpg", "1", "face/")
+    # facecrop("negativeExamples/*.jpg", "2", "face/")
+    test()
