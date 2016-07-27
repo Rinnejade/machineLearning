@@ -10,7 +10,7 @@ facechop.py
 import cv2
 import glob
 import os
-import constants 
+from constants import *
 
 def facechop(image, code, outFolder):
     imageName = image.split("/")[1]
@@ -60,6 +60,6 @@ def test():
 
 if __name__ == '__main__':
     init()
-    # facecrop("positiveExamples/*.jpg", "1", "face/")
+    facecrop("Nisham_Mohammed/*.jpg", "1", "face/")
     # facecrop("negativeExamples/*.jpg", "2", "face/")
     test()

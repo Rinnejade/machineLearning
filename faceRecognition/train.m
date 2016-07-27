@@ -3,7 +3,7 @@ imgType = '*.jpg'; % change based on image type
 images  = dir([imgPath imgType]);
 images = images(randperm(length(images)));
 
-num_labels=2;
+
 idx=1;
 Xtrain = double(imread([imgPath images(idx).name])(:)');
 ytrain=hex2dec(images(idx).name(1));
@@ -17,7 +17,6 @@ imgType = '*.jpg'; % change based on image type
 images  = dir([imgPath imgType]);
 images = images(randperm(length(images)));
 
-num_labels=2;
 idx=1;
 Xtest = double(imread([imgPath images(idx).name])(:)');
 ytest=hex2dec(images(idx).name(1));
@@ -28,6 +27,7 @@ end
 
 input_layer_size = size(X,2);
 hidden_layer_size = ceil(sqrt(input_layer_size));
+num_labels = length(unique(ytrain));
 
 try
 	load Theta1.mat
@@ -63,8 +63,8 @@ Theta1 = reshape(unrolledTheta(1:hidden_layer_size * (input_layer_size + 1)), ..
 Theta2 = reshape(unrolledTheta((1 + (hidden_layer_size * (input_layer_size + 1))):end), ...
                  num_labels, (hidden_layer_size + 1));
 
-save Theta1.mat Theta1
-save Theta2.mat Theta2
+% save Theta1.mat Theta1
+% save Theta2.mat Theta2
 
 pred = predict(Theta1,Theta2,Xtest);
 fprintf('\nTraining Set Accuracy: %f\n', mean(double(pred == ytest)) * 100);
