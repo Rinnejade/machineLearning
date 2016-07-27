@@ -60,6 +60,7 @@ def test():
 
 if __name__ == '__main__':
     init()
-    facecrop("Nisham_Mohammed/*.jpg", "1", "face/")
-    # facecrop("negativeExamples/*.jpg", "2", "face/")
+    # facecrop("Nisham_Mohammed/*.jpg", "1", "face/")
+    # facecrop("Kevin_Joseph/*.jpg", "2", "face/")
+    facecrop("newPic/*.jpg", "1", "face/")
     test()

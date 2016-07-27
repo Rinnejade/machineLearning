@@ -1,3 +1,4 @@
+function [] = saveImages()
 imgPath = 'face/';
 imgType = '*.jpg'; % change based on image type
 images  = dir([imgPath imgType]);
@@ -15,3 +16,4 @@ end
 save X.mat X
 save y.mat y
 
+end
